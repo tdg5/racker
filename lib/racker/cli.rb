@@ -40,18 +40,7 @@ module Racker
       logger.debug('Executing the Racker Processor...')
       template = Processor.new(options).execute!
 
-      # Check that the output directory exists
-      output_dir = File.dirname(File.expand_path(@options[:output]))
-
-      # If the output directory doesnt exist
-      logger.info('Creating the output directory if it does not exist...')
-      FileUtils.mkdir_p output_dir unless File.exists? output_dir
-
-      File.open(@options[:output], 'w') do |file|
-        logger.info('Writing packer template...')
-        file.write(template)
-        logger.info('Writing packer template complete.')
-      end
+      write(@options[:output], template)
 
       # Thats all folks!
       logger.debug('Processing complete.')
@@ -99,6 +88,34 @@ module Racker
           Kernel.exit!(0)
         end
       end
+    end
+
+    def write(output_path, template)
+      if output_path == '-'
+        write_to_stdout(template)
+      else
+        write_to_file(@options[:output], template)
+      end
+    end
+
+    def write_to_file(path, template)
+      # Check that the output directory exists
+      output_dir = File.dirname(File.expand_path(@options[:output]))
+
+      # If the output directory doesnt exist
+      logger.info('Creating the output directory if it does not exist...')
+      FileUtils.mkdir_p output_dir unless File.exists? output_dir
+
+      File.open(@options[:output], 'w') do |file|
+        logger.info('Writing packer template...')
+        file.write(template)
+        logger.info('Writing packer template complete.')
+      end
+    end
+
+    def write_to_stdout(template)
+      $stdout.puts("#{template}\n")
+      $stdout.flush
     end
   end
 end
