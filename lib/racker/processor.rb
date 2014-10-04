@@ -22,13 +22,6 @@ module Racker
         raise "File does not exist!  (#{template})" unless ::File.exists?(template)
       end
 
-      # Check that the output directory exists
-      output_dir = File.dirname(File.expand_path(@options[:output]))
-
-      # If the output directory doesnt exist
-      logger.info('Creating the output directory if it does not exist...')
-      FileUtils.mkdir_p output_dir unless File.exists? output_dir
-
       # Load the templates
       templates = []
 
@@ -64,11 +57,7 @@ module Racker
       compact_template = current_template.compact(:recurse => true)
 
       # Write the compact template out to file
-      File.open(@options[:output], 'w') do |file|
-        logger.info('Writing packer template...')
-        file.write(JSON.pretty_generate(compact_template.to_packer))
-        logger.info('Writing packer template complete.')
-      end
+      JSON.pretty_generate(compact_template.to_packer)
     end
 
     def load(templates)
